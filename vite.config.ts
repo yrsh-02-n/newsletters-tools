@@ -4,10 +4,17 @@ import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: '/',
+  // base: 'https://yrsh-02-n.github.io/newsletters-tools',
+  base: process.env.NODE_ENV === 'production'
+    ? 'https://yrsh-02-n.github.io/newsletters-tools'
+    : '/',                
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+  },
+  server: {
+    port: 3000,
+    open: false,
   },
   publicDir: 'public',
   plugins: [
