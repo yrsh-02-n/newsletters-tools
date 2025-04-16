@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: '/',
+  base: 'https://yrsh-02-n.github.io/newsletters-tools',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
