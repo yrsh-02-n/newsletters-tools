@@ -6,7 +6,7 @@
   "homepage": "https://yrsh-02-n.github.io/newsletters-tools",
   "scripts": {
     "predeploy": "vite build",
-    "deploy": "gh-pages -d dist",
+    "deploy": "gh-pages -d dist -b main",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
