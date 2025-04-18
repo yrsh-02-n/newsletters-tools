@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/redux-hook'
-import { selectLinksList } from '@/features/waLinkGenerator/waLinkGeneratorSelectors.ts'
+import { selectLinksList } from './waLinkGeneratorSelectors'
 
 import { ITemplates } from '@/types'
 import { generateLink, setMessage, setPhone } from './waLinkGeneratorSlice'
@@ -109,11 +109,15 @@ export default function WaLinkGenerator() {
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="option-one" id="option-one" />
-              <Label htmlFor="option-one">By template</Label>
+              <Label className="cursor-pointer" htmlFor="option-one">
+                By template
+              </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="option-two" id="option-two" />
-              <Label htmlFor="option-two">Manual</Label>
+              <Label className="cursor-pointer" htmlFor="option-two">
+                Manual
+              </Label>
             </div>
           </RadioGroup>
         </div>
@@ -126,12 +130,16 @@ export default function WaLinkGenerator() {
                 value={selectedTemplateKey}
                 onValueChange={value => setSelectedTemplateKey(value)}
               >
-                <SelectTrigger className="w-full bg-(--input-bg) border-0">
+                <SelectTrigger className="w-full bg-(--input-bg) border-0 cursor-pointer">
                   <SelectValue placeholder="Select template" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Preset-1">Without unit number</SelectItem>
-                  <SelectItem value="Preset-2">With unit number</SelectItem>
+                  <SelectItem className="cursor-pointer" value="Preset-1">
+                    Without unit number
+                  </SelectItem>
+                  <SelectItem className="cursor-pointer" value="Preset-2">
+                    With unit number
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -196,7 +204,7 @@ export default function WaLinkGenerator() {
               value={userPhone}
               onChange={e => setUserPhone(e.target.value)}
             />
-            <Button className="rounded-l-none" type="submit">
+            <Button className="rounded-l-none cursor-pointer" type="submit">
               Generate
             </Button>
           </div>
@@ -211,12 +219,23 @@ export default function WaLinkGenerator() {
           className="min-h-30 mb-5 bg-(--input-bg} border-0 bg-(--input-bg)"
           value={generatedLink}
         />
-        <Button
-          disabled={!generatedLink}
-          onClick={runCopyToast(generatedLink, 'Link copied to clipboard')}
-        >
-          Copy link
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            className="cursor-pointer"
+            disabled={!generatedLink}
+            onClick={runCopyToast(generatedLink, 'Link copied to clipboard')}
+          >
+            Copy link
+          </Button>
+          <a href={generatedLink} target="_blank">
+            <Button
+              disabled={!generatedLink}
+              className="border-1 border-(--primary) text-(--primary) hover:text-(--accent) bg-background-0 bg-transparent cursor-pointer"
+            >
+              Open link
+            </Button>
+          </a>
+        </div>
       </div>
 
       <div className=" bg-(--card) p-7 pt-5 pb-5 rounded-lg">
