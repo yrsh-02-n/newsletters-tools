@@ -149,3 +149,10 @@ body {
   background: var(--input-bg) !important;
   border: none !important;
 }
+
+@supports (-webkit-appearance: none) {
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    background: none;
+    display: none;
+  }
+}
