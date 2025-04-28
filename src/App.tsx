@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import WaLinkGenerator from '@/features/waLinkGenerator/WaLinkGenerator'
 import { Toaster } from 'sonner'
+import CalendarEventGenerator from './features/calendar-event-generator/CalendarEventGenerator'
 
 function App() {
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>(
@@ -34,7 +35,7 @@ function App() {
         <div className="flex items-center">
           <SunIcon size={20} />
           <Switch
-            className="ml-2 mr-2"
+            className="ml-2 mr-2 cursor-pointer"
             checked={currentTheme === 'dark'}
             onCheckedChange={handleThemeToggle}
           />
@@ -43,19 +44,20 @@ function App() {
       </div>
       <Tabs defaultValue="wa-link" className="w-full">
         <TabsList className="w-full mb-5 border-0">
-          <TabsTrigger className="border-0" value="wa-link">WhatsApp link</TabsTrigger>
+          <TabsTrigger className="border-0 cursor-pointer" value="wa-link">WhatsApp link</TabsTrigger>
           <TabsTrigger
             className="border-0"
             value="calendar"
-            disabled
           >
-            Calendar event (soon)
+            Calendar event generator
           </TabsTrigger>
         </TabsList>
         <TabsContent value="wa-link">
           <WaLinkGenerator />
         </TabsContent>
-        <TabsContent value="calendar">Coming soon</TabsContent>
+        <TabsContent value="calendar">
+          <CalendarEventGenerator/>
+        </TabsContent>
       </Tabs>
       <Toaster />
     </div>

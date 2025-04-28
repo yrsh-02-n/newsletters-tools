@@ -86,7 +86,7 @@ export default function WaLinkGenerator() {
   // Copy link to clipboard and run toast on click
   const runCopyToast =
     (source: string, text: string) => (e: React.MouseEvent) => {
-      e.preventDefault() // Чтобы ссылка не срабатывала
+      e.preventDefault()
       navigator.clipboard
         .writeText(source)
         .then(() => toast.message(text))
@@ -122,6 +122,7 @@ export default function WaLinkGenerator() {
           </RadioGroup>
         </div>
 
+        {/* Template selector */}
         <div className="mb-5">
           <div id="templateSelector" className="mb-5">
             <div className="mb-3">
@@ -144,6 +145,7 @@ export default function WaLinkGenerator() {
               </Select>
             </div>
 
+            {/* Additional params */}
             <div className="flex gap-3 max-[630px]:flex-col">
               <Input
                 disabled={isDisabledUserOptions}
@@ -172,6 +174,7 @@ export default function WaLinkGenerator() {
             </div>
           </div>
 
+          {/* Message */}
           <div id="manualMessage">
             <p className="mb-2">Your message</p>
             <div className="flex">
@@ -194,6 +197,7 @@ export default function WaLinkGenerator() {
           </div>
         </div>
 
+        {/* Phone */}
         <div>
           <p className="mb-2">WhatsApp phone number</p>
           <div className="flex">
@@ -213,6 +217,8 @@ export default function WaLinkGenerator() {
           )}
         </div>
       </form>
+
+      {/* Generated link */}
       <div className="mb-5 bg-(--card) p-7 rounded-lg">
         <p className="mb-2">Your link will appear here</p>
         <Textarea
@@ -227,17 +233,19 @@ export default function WaLinkGenerator() {
           >
             Copy link
           </Button>
-          <a href={generatedLink} target="_blank">
-            <Button
-              disabled={!generatedLink}
-              className="border-1 border-(--primary) text-(--primary) hover:text-(--accent) bg-background-0 bg-transparent cursor-pointer"
-            >
-              Open link
-            </Button>
-          </a>
+          <Button
+            className="border-1 border-(--primary) text-(--primary) hover:text-(--accent) bg-background-0 bg-transparent cursor-pointer"
+            onClick={() =>
+              window.open(generatedLink, '_blank', 'noopener,noreferrer')
+            }
+            disabled={!generatedLink}
+          >
+            Open link
+          </Button>
         </div>
       </div>
 
+      {/* Previous links */}
       <div className=" bg-(--card) p-7 pt-5 pb-5 rounded-lg">
         <Accordion type="single" collapsible>
           <AccordionItem value="lastLinksList">

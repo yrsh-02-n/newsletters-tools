@@ -1,4 +1,4 @@
-export interface WhatsAppLinkState {
+export interface IWhatsAppLinkState {
   phone: string
   message: string
   generatedLink: string

@@ -1,10 +1,10 @@
-import { WhatsAppLinkState } from "@/types";
-import { formatDate } from "@/utils/dateFormatter";
+import { IWhatsAppLinkState } from "@/types";
+import { formatDateTime } from "@/utils/dateFormatter";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const BASE_URL: string = 'https://api.whatsapp.com/send/?phone='
 
-const getInitialState = (): WhatsAppLinkState => {
+const getInitialState = (): IWhatsAppLinkState => {
   if (typeof window !== 'undefined') {
     const saved = localStorage.getItem('whatsapp-links');
     return {
@@ -18,7 +18,7 @@ const getInitialState = (): WhatsAppLinkState => {
   return initialState;
 };
 
-const initialState: WhatsAppLinkState = getInitialState();
+const initialState: IWhatsAppLinkState = getInitialState();
 
 const waLinkGeneratorSlice = createSlice({
   name: 'waLinkGenerator',
@@ -47,8 +47,7 @@ const waLinkGeneratorSlice = createSlice({
 
       const newLink = {
         linkAddress: newGeneratedLink,
-        // linkDate: new Date().toString()
-        linkDate: formatDate()
+        linkDate: formatDateTime()
       };
 
       return {
