@@ -14,7 +14,11 @@ This is particularly useful when your email campaign includes a button linking t
 The app stores the last 5 generated links in localStorage.
 
 # Google Calendar Event Generator
-A tool for creating Google Calendar events. A more detailed description will appear once the generator becomes available.
+A tool for creating Google Calendar events.
+- Select start and end date/time for the event
+- Enter name of event
+- Optionally add description, location, and timezone
+- Generate a ready-to-use Google Calendar event link based on your inputs
 
 # Main Goals
 The purpose of creating this application was to combine:
