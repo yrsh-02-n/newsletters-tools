@@ -6,5 +6,9 @@ export interface ICalendargeneratorState {
   eventTimeZone: string,
   eventLocation: string,
   eventGeneratedLink: string,
-  lastEventsList: { linkAddress: string, linkDate: string }[]
+  lastEventsList: { linkAddress: string, linkDate: string }[],
+  errors: {
+    dateError: string | null,
+    titleError: string | null
+  }
 }

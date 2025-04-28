@@ -6,7 +6,7 @@ const BASE_URL: string = 'https://calendar.google.com/calendar/u/0/r/eventedit?t
 
 const getInitialState = (): ICalendargeneratorState => {
   if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('calendar-events');
+    const saved = localStorage.getItem('events-links');
     return {
       eventBeginningDate: null,
       eventEndingDate: null,
@@ -16,6 +16,10 @@ const getInitialState = (): ICalendargeneratorState => {
       eventLocation: '',
       eventGeneratedLink: '',
       lastEventsList: saved ? JSON.parse(saved) : [],
+      errors: {
+        dateError: null,
+        titleError: null
+      }
     }
   }
   return {
@@ -27,6 +31,10 @@ const getInitialState = (): ICalendargeneratorState => {
     eventLocation: '',
     eventGeneratedLink: '',
     lastEventsList: [],
+    errors: {
+      dateError: null,
+      titleError: null
+    }
   }
 }
 
@@ -53,7 +61,13 @@ const calendarEventGeneratorSlice = createSlice({
       state.eventLocation = action.payload
     },
     generateEventLink: (state) => {
+      // Dates and name check
       if (!state.eventBeginningDate || !state.eventEndingDate) {
+        state.errors.dateError = 'Please select both start and end dates'
+        return state
+      }
+      if (!state.eventTitle) {
+        state.errors.titleError = 'Please enter event name'
         return state
       }
 
@@ -66,13 +80,16 @@ const calendarEventGeneratorSlice = createSlice({
         .replace(/\s+/g, '')
         .replace(/\/+/g, '/')
 
+      // Encode strings
       const encodedTitle = encodeURIComponent(state.eventTitle)
       const encodedDescription = encodeURIComponent(state.eventDescription)
       const encodedLocation = encodeURIComponent(state.eventLocation)
 
+      // Format dates
       const formattedBeginningDate = formatForGoogleCalendar(beginningDate)
       const formattedEndingDate = formatForGoogleCalendar(endingDate)
 
+      // Generate link from data
       const newGeneratedLink = `${BASE_URL}${encodedTitle}&dates=${formattedBeginningDate}/${formattedEndingDate}&ctz=${fixedTimeZone}&details=${encodedDescription}&location=${encodedLocation}&addtocalendar&sf=true&output=xml`
 
       const newLink = {
@@ -80,16 +97,11 @@ const calendarEventGeneratorSlice = createSlice({
         linkDate: formatDateTime(new Date())
       }
 
-      // LocalStorage
-      const updatedEvents = [newLink, ...state.lastEventsList.slice(0, 9)]
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('calendar-events', JSON.stringify(updatedEvents))
-      }
-
       return {
         ...state,
         eventGeneratedLink: newGeneratedLink,
-        lastEventsList: updatedEvents
+        errors: { dateError: null, titleError: null },
+        lastEventsList: [newLink, ...state.lastEventsList].slice(0, 5)
       }
     }
   }

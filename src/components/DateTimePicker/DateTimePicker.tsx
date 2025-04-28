@@ -87,7 +87,7 @@ export const DateTimePicker = ({
   const displayValue = value ? formatDateTime(value) : placeholder
 
   return (
-    <div className="w-full flex gap-3 mb-3">
+    <div className="w-full flex gap-x-3 mb-2">
       {/* Start date picker */}
       <div className="w-full relative flex-1">
         <Input

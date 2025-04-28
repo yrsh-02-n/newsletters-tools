@@ -86,7 +86,7 @@ export default function WaLinkGenerator() {
   // Copy link to clipboard and run toast on click
   const runCopyToast =
     (source: string, text: string) => (e: React.MouseEvent) => {
-      e.preventDefault() // Чтобы ссылка не срабатывала
+      e.preventDefault()
       navigator.clipboard
         .writeText(source)
         .then(() => toast.message(text))

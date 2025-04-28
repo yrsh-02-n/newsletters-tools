@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/redux-hook'
+import { selectEventsList } from './calendarEventGeneratorSelectors'
 
 import {
   setEventBeginningDate,
@@ -30,13 +31,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { toast } from 'sonner'
 
 import { DateTimePicker } from '@/components/DateTimePicker/DateTimePicker'
 
 export default function CalendarEventGenerator() {
   const dispatch = useAppDispatch()
   const timezonesList: ITimezones[] = timezones
-  const { eventGeneratedLink } = useAppSelector(
+  const { eventGeneratedLink, errors } = useAppSelector(
     state => state.calendarEventGenerator,
   )
 
@@ -54,12 +56,6 @@ export default function CalendarEventGenerator() {
   const handleGenerateLink = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // undefined check
-    if (!startDate || !endDate) {
-      alert('Please select both start and end dates')
-      return
-    }
-
     // Dispatch data
     dispatch(setEventBeginningDate(startDate))
     dispatch(setEventEndingDate(endDate))
@@ -70,6 +66,23 @@ export default function CalendarEventGenerator() {
     dispatch(generateEventLink())
   }
 
+  // Get the links list and save list local
+  const eventsLinksList = useAppSelector(selectEventsList)
+
+  useEffect(() => {
+    localStorage.setItem('events-links', JSON.stringify(eventsLinksList))
+  }, [eventsLinksList])
+
+  // Copy link to clipboard and run toast on click
+  const runCopyToast =
+    (source: string, text: string) => (e: React.MouseEvent) => {
+      e.preventDefault()
+      navigator.clipboard
+        .writeText(source)
+        .then(() => toast.message(text))
+        .catch(() => toast.message('Copy failed'))
+    }
+
   return (
     <div>
       {/* Event date and time */}
@@ -78,27 +91,43 @@ export default function CalendarEventGenerator() {
         onSubmit={handleGenerateLink}
       >
         <p className="mb-2">Date and time of event</p>
-        <div className="flex gap-3 mb-2">
-          <DateTimePicker
-            value={startDate ?? undefined}
-            onChange={date => setStartDate(date ?? undefined)}
-            placeholder="Start date and time"
-          />
-          <DateTimePicker
-            value={endDate ?? undefined}
-            onChange={date => setEndDate(date ?? undefined)}
-            placeholder="End date and time"
-          />
+        <div className="mb-2">
+          <div className="flex gap-x-3 gap-y-0">
+            <DateTimePicker
+              value={startDate ?? undefined}
+              onChange={date => setStartDate(date ?? undefined)}
+              placeholder="Start date and time"
+            />
+            <DateTimePicker
+              value={endDate ?? undefined}
+              onChange={date => setEndDate(date ?? undefined)}
+              placeholder="End date and time"
+            />
+          </div>
+          <div>
+            {errors.dateError && (
+              <p className="text-sm text-(--error)">{errors.dateError}</p>
+            )}
+          </div>
         </div>
 
         {/* Event title and description */}
         <div>
-          <p className="mb-2">The name of the event</p>
-          <Input
-            className="bg-(--input-bg) border-0 mb-3"
-            value={eventTitle}
-            onChange={e => setEventTitle(e.target.value)}
-          />
+          <div className="mb-3">
+            <p className="mb-2">The name of the event</p>
+            <Input
+              className="bg-(--input-bg) border-0"
+              value={eventTitle}
+              onChange={e => setEventTitle(e.target.value)}
+            />
+            <div>
+              {errors.dateError && (
+                <p className="text-sm text-(--error) mt-1">
+                  {errors.titleError}
+                </p>
+              )}
+            </div>
+          </div>
           <p className="mb-2">Description of the event</p>
           <Textarea
             className="min-h-20 mb-5 bg-(--input-bg} border-0 bg-(--input-bg)"
@@ -159,17 +188,20 @@ export default function CalendarEventGenerator() {
         <div className="flex gap-3">
           <Button
             className="cursor-pointer"
-            // disabled={!generatedLink}
-            // onClick={runCopyToast(generatedLink, 'Link copied to clipboard')}
+            disabled={!eventGeneratedLink}
+            onClick={runCopyToast(
+              eventGeneratedLink,
+              'Link copied to clipboard',
+            )}
           >
             Copy link
           </Button>
           <Button
             className="border-1 border-(--primary) text-(--primary) hover:text-(--accent) bg-background-0 bg-transparent cursor-pointer"
-            // onClick={() =>
-            //   window.open(generatedLink, '_blank', 'noopener,noreferrer')
-            // }
-            // disabled={!generatedLink}
+            disabled={!eventGeneratedLink}
+            onClick={() =>
+              window.open(eventGeneratedLink, '_blank', 'noopener,noreferrer')
+            }
           >
             Open link
           </Button>
@@ -183,7 +215,29 @@ export default function CalendarEventGenerator() {
             <AccordionTrigger className="p-0 text-md font-semibold hover:no-underline">
               Your last events
             </AccordionTrigger>
-            <AccordionContent className="mt-5 pt-5 border-t-2"></AccordionContent>
+            <AccordionContent className="mt-5 pt-5 border-t-2">
+              <ul>
+                {eventsLinksList.map(link => (
+                  <li
+                    key={link.linkDate}
+                    className="flex justify-between not-last:mb-2"
+                  >
+                    <a href={link.linkAddress} target="_blank">
+                      {link.linkDate}
+                    </a>
+                    <button
+                      className="cursor-pointer"
+                      onClick={runCopyToast(
+                        link.linkAddress,
+                        'Link copied to clipboard',
+                      )}
+                    >
+                      Copy link
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </AccordionContent>
           </AccordionItem>
         </Accordion>
       </div>
