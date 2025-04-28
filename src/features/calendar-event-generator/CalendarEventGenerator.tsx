@@ -1,4 +1,18 @@
 import { useState } from 'react'
+import { useAppDispatch, useAppSelector } from '@/redux-hook'
+
+import {
+  setEventBeginningDate,
+  setEventEndingDate,
+  setEventTitle as setReduxEventTitle,
+  setEventDescription as setReduxEventDescription,
+  setEventTimeZone,
+  setEventLocation,
+  generateEventLink,
+} from './calendarEventGeneratorSlice'
+
+import { ITimezones } from '@/types/timezones'
+import { timezones } from '@/data/timezones'
 
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -17,49 +31,89 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 
-import { ITimezones } from '@/types/timezones'
-import { timezones } from '@/data/timezones'
-
 import { DateTimePicker } from '@/components/DateTimePicker/DateTimePicker'
 
 export default function CalendarEventGenerator() {
-  const [startDate, setStartDate] = useState<Date>()
-  const [endDate, setEndDate] = useState<Date>()
+  const dispatch = useAppDispatch()
   const timezonesList: ITimezones[] = timezones
+  const { eventGeneratedLink } = useAppSelector(
+    state => state.calendarEventGenerator,
+  )
+
+  // Get date and time
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined)
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined)
+
+  // Other fields
+  const [eventTitle, setEventTitle] = useState('')
+  const [eventDescription, setEventDescription] = useState('')
+  const [timeZone, setTimeZone] = useState('')
+  const [location, setLocation] = useState('')
+
+  // Generate link
+  const handleGenerateLink = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // undefined check
+    if (!startDate || !endDate) {
+      alert('Please select both start and end dates')
+      return
+    }
+
+    // Dispatch data
+    dispatch(setEventBeginningDate(startDate))
+    dispatch(setEventEndingDate(endDate))
+    dispatch(setReduxEventTitle(eventTitle))
+    dispatch(setReduxEventDescription(eventDescription))
+    dispatch(setEventTimeZone(timeZone))
+    dispatch(setEventLocation(location))
+    dispatch(generateEventLink())
+  }
 
   return (
     <div>
-      {/* Date and time */}
-      <form className="mb-5 bg-(--card) p-7 rounded-lg">
+      {/* Event date and time */}
+      <form
+        className="mb-5 bg-(--card) p-7 rounded-lg"
+        onSubmit={handleGenerateLink}
+      >
         <p className="mb-2">Date and time of event</p>
         <div className="flex gap-3 mb-2">
           <DateTimePicker
-            value={startDate}
-            onChange={setStartDate}
+            value={startDate ?? undefined}
+            onChange={date => setStartDate(date ?? undefined)}
             placeholder="Start date and time"
           />
           <DateTimePicker
-            value={endDate}
-            onChange={setEndDate}
+            value={endDate ?? undefined}
+            onChange={date => setEndDate(date ?? undefined)}
             placeholder="End date and time"
           />
         </div>
 
-        {/* Event title */}
+        {/* Event title and description */}
         <div>
           <p className="mb-2">The name of the event</p>
-          <Input className="bg-(--input-bg) border-0 mb-3"></Input>
+          <Input
+            className="bg-(--input-bg) border-0 mb-3"
+            value={eventTitle}
+            onChange={e => setEventTitle(e.target.value)}
+          />
           <p className="mb-2">Description of the event</p>
-          <Textarea className="min-h-20 mb-5 bg-(--input-bg} border-0 bg-(--input-bg)" />
+          <Textarea
+            className="min-h-20 mb-5 bg-(--input-bg} border-0 bg-(--input-bg)"
+            value={eventDescription}
+            onChange={e => setEventDescription(e.target.value)}
+          />
         </div>
 
-        {/* Event description */}
+        {/* Event time zone select */}
         <div className="flex gap-3 mb-2">
           <div className="w-full">
             <p className="mb-2">Time zone</p>
             <Select
-            // value='{selectedTemplateKey}'
-            // onValueChange={value => setSelectedTemplateKey(value)}
+              value={timeZone}
+              onValueChange={value => setTimeZone(value)}
             >
               <SelectTrigger className="w-full bg-(--input-bg) border-0 cursor-pointer">
                 <SelectValue placeholder="Select timezone, GMT" />
@@ -77,10 +131,21 @@ export default function CalendarEventGenerator() {
               </SelectContent>
             </Select>
           </div>
-          <div className="w-full">
+
+          {/* Event location */}
+          <div className="w-full mb-3">
             <p className="mb-2">Location</p>
-            <Input className="bg-(--input-bg) border-0 w-full"></Input>
+            <Input
+              className="bg-(--input-bg) border-0 w-full"
+              value={location}
+              onChange={e => setLocation(e.target.value)}
+            ></Input>
           </div>
+        </div>
+        <div>
+          <Button className="cursor-pointer" type="submit">
+            Generate
+          </Button>
         </div>
       </form>
 
@@ -89,7 +154,7 @@ export default function CalendarEventGenerator() {
         <p className="mb-2">Your link will appear here</p>
         <Textarea
           className="min-h-30 mb-5 bg-(--input-bg} border-0 bg-(--input-bg)"
-          // value={generatedLink}
+          value={eventGeneratedLink}
         />
         <div className="flex gap-3">
           <Button

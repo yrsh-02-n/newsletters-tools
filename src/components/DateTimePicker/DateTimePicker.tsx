@@ -1,4 +1,4 @@
-import { useState, useRef, ChangeEventHandler } from 'react'
+import { useState, useRef, useEffect, ChangeEventHandler } from 'react'
 
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -13,8 +13,8 @@ import {
 import { formatDateTime } from '@/utils/dateFormatter'
 
 interface DateTimePickerProps {
-  value?: Date
-  onChange: (date: Date | undefined) => void
+  value?: Date | null
+  onChange: (date: Date | null) => void
   placeholder?: string
 }
 
@@ -28,6 +28,19 @@ export const DateTimePicker = ({
 
   // Pick time by btn in input
   const timeInputRef = useRef<HTMLInputElement>(null)
+
+  // initialize time on value change
+  useEffect(() => {
+    if (value) {
+      setTimeValue(
+        `${String(value.getHours()).padStart(2, '0')}:${String(
+          value.getMinutes(),
+        ).padStart(2, '0')}`,
+      )
+      setMonth(value)
+    }
+  }, [value])
+
   const handleClickBtn = () => {
     timeInputRef.current?.showPicker()
   }
@@ -37,19 +50,26 @@ export const DateTimePicker = ({
     const time = e.target.value
     setTimeValue(time)
 
-    if (!value) return
-
-    const [hours, minutes] = time.split(':').map(Number)
-    const newDate = new Date(value)
-    newDate.setHours(hours, minutes)
-    onChange(newDate)
+    if (!value) {
+      // if date is not selected: create new with current date and time
+      const now = new Date()
+      const [hours, minutes] = time.split(':').map(Number)
+      now.setHours(hours, minutes)
+      onChange(now)
+    } else {
+      // update time only for current date
+      const [hours, minutes] = time.split(':').map(Number)
+      const newDate = new Date(value)
+      newDate.setHours(hours, minutes)
+      onChange(newDate)
+    }
   }
 
   // Pick date and time in input
   // (https://daypicker.dev/guides/input-fields)
   const handleDateSelect = (date: Date | undefined) => {
     if (!date) {
-      onChange(undefined)
+      onChange(null)
       return
     }
 
@@ -63,6 +83,7 @@ export const DateTimePicker = ({
   }
 
   // Formatted input value
+  const calendarSelectedValue = value === null ? undefined : value
   const displayValue = value ? formatDateTime(value) : placeholder
 
   return (
@@ -72,7 +93,6 @@ export const DateTimePicker = ({
         <Input
           className="w-full bg-(--input-bg) border-0 pl-3 pr-10"
           value={displayValue}
-          placeholder="The beginning"
           readOnly
         />
         <Popover>
@@ -91,7 +111,7 @@ export const DateTimePicker = ({
           >
             <Calendar
               mode="single"
-              selected={value}
+              selected={calendarSelectedValue}
               onSelect={handleDateSelect}
               month={month}
               onMonthChange={setMonth}

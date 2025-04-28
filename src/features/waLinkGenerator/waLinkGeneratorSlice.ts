@@ -47,7 +47,6 @@ const waLinkGeneratorSlice = createSlice({
 
       const newLink = {
         linkAddress: newGeneratedLink,
-        // linkDate: new Date().toString()
         linkDate: formatDateTime()
       };
 
